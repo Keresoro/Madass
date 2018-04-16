@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/xrestname"
+        android:layout_width="234dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.06"
+        android:text="Restaurant name:"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/xeditname"
+        android:layout_weight="0.05" />
+
+    <TextView
+        android:id="@+id/xrestad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.06"
+        android:text="Restaurant address:"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/xeditrestad"
+        android:layout_weight="0.05" />
+
+    <TextView
+        android:id="@+id/xcusine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.06"
+        android:text="Cusune:"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/xeditcusine"
+        android:layout_weight="0.05" />
+
+    <TextView
+        android:id="@+id/xrating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.06"
+        android:text="Rating (1-10):"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/xeditrating"
+        android:inputType="numberDecimal"
+        android:layout_weight="0.05" />
+
+    <Button
+        android:id="@+id/xaddrest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.06"
+        android:text="Add this restaurant!" />
+
+
+
+</LinearLayout>

@@ -1,3 +1,7 @@
 <resources>
+
     <string name="app_name">Madass</string>
+    <string name="addRestaurants">Add Restaurants</string>
+    <string name="buttonaddRestaurants">Add this Restaurant</string>
+
 </resources>
