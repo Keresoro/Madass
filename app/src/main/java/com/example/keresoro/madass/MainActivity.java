@@ -32,6 +32,7 @@ public class MainActivity extends Activity implements LocationListener
     MapView mv;
     ItemizedIconOverlay<OverlayItem> items;
     ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
+    ArrayList<ListRestaurants> resto = new ArrayList<>();
 
     Double latitude = 50.9;
     Double longitude = -1.4;
@@ -141,8 +142,12 @@ public class MainActivity extends Activity implements LocationListener
                 Bundle extras = intent.getExtras();
                 String name = extras.getString("com.example.restname");
                 String address = extras.getString("com.example.raddress");
-                String cuisine = extras.getString("com.example.cusine");
+                String cusine = extras.getString("com.example.cusine");
                 int rating = extras.getInt("com.example.rating");
+        //Adding restaurants to arraylist
+
+             resto.add(new ListRestaurants(name, address, cusine, rating, latitude, longitude ));
+                OverlayItem rests = new OverlayItem(name +", address: " + address, cusine+" , rating:" +rating, new GeoPoint(latitude, longitude) );
             }
         }
     }
