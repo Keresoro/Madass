@@ -9,6 +9,7 @@ import android.location.Location;
 import android.content.Context;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.ArrayList;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 
@@ -16,6 +17,8 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -27,6 +30,8 @@ import android.view.MenuItem;
 public class MainActivity extends Activity implements LocationListener
 {
     MapView mv;
+    ItemizedIconOverlay<OverlayItem> items;
+    ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
 
     Double latitude = 50.9;
     Double longitude = -1.4;
@@ -44,7 +49,7 @@ public class MainActivity extends Activity implements LocationListener
         mv = (MapView) findViewById(R.id.map1);
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
-        mv.getController().setCenter(new GeoPoint(latitude, longitude));
+
 
         TextView lat = (TextView) findViewById(R.id.lat1);
         TextView valuelat = (TextView) findViewById(R.id.value1);
@@ -52,6 +57,33 @@ public class MainActivity extends Activity implements LocationListener
         TextView valuelon = (TextView) findViewById(R.id.value2);
         //valuelat.setText(lat.toString());
         //valuelon.setText(lon.toString());
+
+        markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>()
+        {
+            public boolean onItemLongPress(int i, OverlayItem item)
+            {
+                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            public boolean onItemSingleTapUp(int i, OverlayItem item)
+            {
+                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        };
+
+        items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+        OverlayItem fernhurst = new OverlayItem("Fernhurst", "the village of Fernhurst", new GeoPoint(51.05, -0.72));
+
+        // NOTE is just this.getDrawable() if supporting API 21+ only
+        fernhurst.setMarker(getResources().getDrawable(R.drawable.marker));
+        items.addItem(fernhurst);
+        items.addItem(new OverlayItem("Blackdown", "highest point in West Sussex", new GeoPoint(51.0581, -0.6897)));
+        mv.getOverlays().add(items);
+
+
+
     }
 
 
@@ -91,16 +123,27 @@ public class MainActivity extends Activity implements LocationListener
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        if(item.getItemId() == R.id.AddRest)
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.AddRest) {
             // react to the menu item being selected...
+            Intent intent = new Intent(this, AddRestaurants.class);
+            startActivityForResult(intent, 0);
             return true;
         }
         return false;
     }
 
+    protected  void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-
+        // retrieve values from AddMarker activity
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                Bundle extras = intent.getExtras();
+                String name = extras.getString("com.example.restname");
+                String address = extras.getString("com.example.raddress");
+                String cuisine = extras.getString("com.example.cusine");
+                int rating = extras.getInt("com.example.rating");
+            }
+        }
+    }
 }
