@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/AddRest" android:title="@string/addRestaurants"/>
-
-
+    <item android:id="@+id/SaveRest" android:title="Save Restaurants"/>
+    <item android:id="@+id/LoadRest" android:title="Load Restaurants"/>
 </menu>

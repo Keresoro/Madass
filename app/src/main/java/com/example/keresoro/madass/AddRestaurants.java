@@ -21,19 +21,10 @@ public class AddRestaurants extends AppCompatActivity implements OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_restaurants);
 
-        TextView restname = (TextView) findViewById(R.id.xrestname);
-        EditText editname = (EditText) findViewById(R.id.xeditname);
-        TextView restad = (TextView) findViewById(R.id.xrestad);
-        EditText editrestad = (EditText) findViewById(R.id.xeditrestad);
-        TextView cusine = (TextView) findViewById(R.id.xcusine);
-        EditText editcusine = (EditText) findViewById(R.id.xeditcusine);
-        TextView rating = (TextView) findViewById(R.id.xrating);
-        EditText editrating = (EditText) findViewById(R.id.xeditrating);
-
         Button AddRest = (Button)findViewById(R.id.xaddrest);
         AddRest.setOnClickListener(this);
     }
-    public void onClick(View v)
+    public void onClick(View view)
     {
         //// Edit Texts initialisation
         TextView restname = (TextView) findViewById(R.id.xrestname);
@@ -49,9 +40,9 @@ public class AddRestaurants extends AppCompatActivity implements OnClickListener
         String namerest = editname.getText().toString();
         String adrest = editrestad.getText().toString();
         String scusine = editcusine.getText().toString();
-        int srating = Integer.getInteger(editrating.getText().toString());
+        int srating = Integer.parseInt(editrating.getText().toString());
 
-        if (srating <=10 || srating >0 ) {
+        if (srating >10 || srating <0 ) {
             new AlertDialog.Builder(this).setMessage("Enter Value from 1-10 only!").
                     setPositiveButton("OK", null).show();
         } else {
