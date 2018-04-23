@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 int rating = extras.getInt("com.example.rating");
 
                 //Adding restaurants to arraylist
-                //resto.add(new ListRestaurants(name, address, cusine, rating, latitude, longitude));
+                resto.add(new ListRestaurants(name, address, cusine, rating, latitude, longitude));
                 items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), markerGestureListener);
                 OverlayItem rests = new OverlayItem(name, "Name of Restaurant: " + name + " Address: " + address + "\n" + "Cusine: " + cusine + " Rating: " + rating, new GeoPoint(latitude, longitude));
                 rests.setMarker(getResources().getDrawable(R.drawable.marker));
@@ -170,9 +170,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             return message;
         }
 
-        //public void onPostExecute(String message) {
-        //    new AlertDialog.Builder(MainActivity.this).setMessage(message).setPositiveButton("OKAY", null).show();
-        //}
+        public void onPostExecute(String message) {
+            new AlertDialog.Builder(MainActivity.this).setMessage(message).setPositiveButton("OKAY", null).show();
+        }
     }
 
     //loading the restaurants from file
@@ -188,20 +188,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     if (components.length == 6) {
                         ListRestaurants thisrestaurant = new ListRestaurants(components[0], components[1], components[2], Integer.parseInt(components[3]), Double.parseDouble(components[4]), Double.parseDouble(components[5]));
                         resto.add(thisrestaurant);
-                        OverlayItem restaurant = new OverlayItem(thisrestaurant.Restname + ", address: " + thisrestaurant.Restaddress, thisrestaurant.Restcusine + ", rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
-                        items.addItem(restaurant);
+                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname + ", address: " + thisrestaurant.Restaddress, thisrestaurant.Restcusine + ", rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
+                        items.addItem(rests);
                     }
                 }
-            } //catch (FileNotFoundException e) {
-               // System.out.println("Input file data.csv could not be found!");
-           // }
+            } catch (FileNotFoundException e) {
+                System.out.println("Input file data.csv could not be found!");
+            }
             catch (IOException e) {
                 System.out.println("ERROR: " + e);
             }
             return message;
         }
-        //public void onPostExecute(String message) {
-        //    new AlertDialog.Builder(MainActivity.this).setMessage(message).setPositiveButton("OKAY", null).show();
-        //}
+        public void onPostExecute(String message) {
+            new AlertDialog.Builder(MainActivity.this).setMessage(message).setPositiveButton("OKAY", null).show();
+        }
     }
 }
