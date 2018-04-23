@@ -1,5 +1,6 @@
 package com.example.keresoro.madass;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -40,26 +41,40 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity implements LocationListener {
     MapView mv;
     ItemizedIconOverlay<OverlayItem> items;
-    ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
+    MyOverlayGestureListener markerGestureListener;
     ArrayList<ListRestaurants> resto = new ArrayList<>();
     double latitude;
     double longitude;
 
     @Override
+    public void onStart(){
+        super.onStart();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    }
+    public void onDestroy(){
+        super.onDestroy();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    }
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LocationManager mgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
-
         mv = (MapView) findViewById(R.id.map1);
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
 
-        markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+        markerGestureListener = new MyOverlayGestureListener();
+        items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+        LocationManager mgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        Location location = mgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        mv.getController().setCenter(new GeoPoint(latitude, longitude));
+    }
+        class MyOverlayGestureListener implements  ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
             public boolean onItemLongPress(int i, OverlayItem item) {
                 Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_LONG).show();
                 return true;
@@ -69,15 +84,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
-        };
-
-        Location location = mgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        mv.getController().setCenter(new GeoPoint(latitude, longitude));
-
-    }
+        }
 
 
     public void onLocationChanged(Location newLoc) {
@@ -126,6 +133,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             OptionLoad load = new OptionLoad();
             load.execute();
             mv.getOverlays().add(items);
+        } else if (item.getItemId() == R.id.savePref){
+            Intent intent = new Intent(this,PreferencesActivity.class);
+            setResult(RESULT_OK, intent);
+            startActivityForResult(intent,1);
         }
 
         return false;
@@ -144,11 +155,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
                 //Adding restaurants to arraylist
                 resto.add(new ListRestaurants(name, address, cusine, rating, latitude, longitude));
-                items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), markerGestureListener);
                 OverlayItem rests = new OverlayItem(name, "Name of Restaurant: " + name + " Address: " + address + "\n" + "Cusine: " + cusine + " Rating: " + rating, new GeoPoint(latitude, longitude));
                 rests.setMarker(getResources().getDrawable(R.drawable.marker));
                 items.addItem(rests);
                 mv.getOverlays().add(items);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean autoSave = prefs.getBoolean("savePreferences", true);
+                if(autoSave==true) {
+                    OptionSave savePrefs = new OptionSave();
+                    savePrefs.execute();
+                }
             }
         }
     }
@@ -188,7 +204,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     if (components.length == 6) {
                         ListRestaurants thisrestaurant = new ListRestaurants(components[0], components[1], components[2], Integer.parseInt(components[3]), Double.parseDouble(components[4]), Double.parseDouble(components[5]));
                         resto.add(thisrestaurant);
-                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname + ", address: " + thisrestaurant.Restaddress, thisrestaurant.Restcusine + ", rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
+                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname,"Name of Restaurant: " + thisrestaurant.Restname + " Address: " + thisrestaurant.Restaddress + "\n" + "Cusine: " + thisrestaurant.Restcusine + " Rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
+                        rests.setMarker(getResources().getDrawable(R.drawable.marker));
                         items.addItem(rests);
                     }
                 }

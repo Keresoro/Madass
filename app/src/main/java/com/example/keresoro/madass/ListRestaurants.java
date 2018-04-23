@@ -1,6 +1,7 @@
 package com.example.keresoro.madass;
 
 
+
 public class ListRestaurants {
 
     String Restname, Restaddress, Restcusine;
