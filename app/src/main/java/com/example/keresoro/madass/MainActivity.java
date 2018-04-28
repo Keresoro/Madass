@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             OptionSave save = new OptionSave();
             save.execute();
         } else if (item.getItemId() == R.id.LoadRest) {
-            //loading restaurants from file to arrayList
             OptionLoad load = new OptionLoad();
             load.execute();
             mv.getOverlays().add(items);
@@ -144,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-        // retrieve values from AddMarker activity
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 Bundle extras = intent.getExtras();
@@ -196,15 +194,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         public String doInBackground(Void... unused) {
             String message = "Succesfully loaded restaurants!";
             try {
-                FileReader fr = new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/data.csv");
-                BufferedReader reader = new BufferedReader(fr);
+                FileReader filereader = new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/data.csv");
+                BufferedReader reader = new BufferedReader(filereader);
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] components = line.split(",");
                     if (components.length == 6) {
-                        ListRestaurants thisrestaurant = new ListRestaurants(components[0], components[1], components[2], Integer.parseInt(components[3]), Double.parseDouble(components[4]), Double.parseDouble(components[5]));
+                        ListRestaurants thisrestaurant = new ListRestaurants(components[0], components[1], components[2],
+                                Integer.parseInt(components[3]), Double.parseDouble(components[4]), Double.parseDouble(components[5]));
                         resto.add(thisrestaurant);
-                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname,"Name of Restaurant: " + thisrestaurant.Restname + " Address: " + thisrestaurant.Restaddress + "\n" + "Cusine: " + thisrestaurant.Restcusine + " Rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
+                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname,"Name of Restaurant: " + thisrestaurant.Restname + " Address: " + thisrestaurant.Restaddress +
+                                "\n" + "Cusine: " + thisrestaurant.Restcusine + " Rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
                         rests.setMarker(getResources().getDrawable(R.drawable.marker));
                         items.addItem(rests);
                     }

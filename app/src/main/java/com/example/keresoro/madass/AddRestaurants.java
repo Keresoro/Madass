@@ -49,7 +49,7 @@ public class AddRestaurants extends AppCompatActivity implements OnClickListener
             Intent intent = new Intent();
             Bundle bundle = new Bundle();
 
-            // Send variables to main activity via bundle
+            // Send variables to main activity through bundle
             bundle.putString("com.example.restname",namerest);
             bundle.putString("com.example.raddress", adrest);
             bundle.putString("com.example.cusine", scusine);
