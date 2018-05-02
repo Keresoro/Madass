@@ -19,7 +19,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -41,20 +45,22 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity implements LocationListener {
     MapView mv;
     ItemizedIconOverlay<OverlayItem> items;
-    MyOverlayGestureListener markerGestureListener;
+    ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
     ArrayList<ListRestaurants> resto = new ArrayList<>();
     double latitude;
     double longitude;
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
-    public void onDestroy(){
+
+    public void onDestroy() {
         super.onDestroy();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -64,8 +70,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
 
-        markerGestureListener = new MyOverlayGestureListener();
-        items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+
         LocationManager mgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         Location location = mgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -73,10 +78,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         mv.getController().setCenter(new GeoPoint(latitude, longitude));
-    }
-        class MyOverlayGestureListener implements  ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
+        Toast.makeText
+                (this, "Your Location is" +
+                        latitude + " " +
+                        longitude, Toast.LENGTH_LONG).show();
+
+        markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             public boolean onItemLongPress(int i, OverlayItem item) {
-                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
 
@@ -84,18 +93,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
-        }
+        };
 
+        items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+        mv.getOverlays().add(items);
+
+    }
 
     public void onLocationChanged(Location newLoc) {
-        // mv.getController().setCenter(new GeoPoint(newLoc.getLatitude(), newLoc.getLongitude()));
         latitude = Double.parseDouble(String.valueOf(newLoc.getLatitude()));
         longitude = Double.parseDouble(String.valueOf(newLoc.getLongitude()));
         mv.getController().setCenter(new GeoPoint(latitude, longitude));
         Toast.makeText
                 (this, "Location=" +
-                        newLoc.getLatitude() + " " +
-                        newLoc.getLongitude(), Toast.LENGTH_LONG).show();
+                        latitude + " " +
+                        longitude, Toast.LENGTH_LONG).show();
     }
 
     public void onProviderDisabled(String provider) {
@@ -109,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
         Toast.makeText(this, "Status changed: " + status,
                 Toast.LENGTH_LONG).show();
     }
@@ -128,14 +139,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else if (item.getItemId() == R.id.SaveRest) {
             OptionSave save = new OptionSave();
             save.execute();
+            return true;
         } else if (item.getItemId() == R.id.LoadRest) {
             OptionLoad load = new OptionLoad();
             load.execute();
             mv.getOverlays().add(items);
-        } else if (item.getItemId() == R.id.savePref){
-            Intent intent = new Intent(this,PreferencesActivity.class);
+            return true;
+        } else if (item.getItemId() == R.id.savePref) {
+            Intent intent = new Intent(this, PreferencesActivity.class);
             setResult(RESULT_OK, intent);
-            startActivityForResult(intent,1);
+            startActivityForResult(intent, 1);
+            return true;
+        } else if (item.getItemId() == R.id.loadFromWeb) {
+            LoadFromWeb loadweb = new LoadFromWeb();
+            loadweb.execute();
+            return true;
         }
 
         return false;
@@ -156,10 +174,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 OverlayItem rests = new OverlayItem(name, "Name of Restaurant: " + name + " Address: " + address + "\n" + "Cusine: " + cusine + " Rating: " + rating, new GeoPoint(latitude, longitude));
                 rests.setMarker(getResources().getDrawable(R.drawable.marker));
                 items.addItem(rests);
-                mv.getOverlays().add(items);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 boolean autoSave = prefs.getBoolean("savePreferences", true);
-                if(autoSave==true) {
+                if (autoSave == true) {
                     OptionSave savePrefs = new OptionSave();
                     savePrefs.execute();
                 }
@@ -203,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         ListRestaurants thisrestaurant = new ListRestaurants(components[0], components[1], components[2],
                                 Integer.parseInt(components[3]), Double.parseDouble(components[4]), Double.parseDouble(components[5]));
                         resto.add(thisrestaurant);
-                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname,"Name of Restaurant: " + thisrestaurant.Restname + " Address: " + thisrestaurant.Restaddress +
+                        OverlayItem rests = new OverlayItem(thisrestaurant.Restname, "Name of Restaurant: " + thisrestaurant.Restname + " Address: " + thisrestaurant.Restaddress +
                                 "\n" + "Cusine: " + thisrestaurant.Restcusine + " Rating: " + thisrestaurant.Restrating, new GeoPoint(thisrestaurant.latitude, thisrestaurant.longitude));
                         rests.setMarker(getResources().getDrawable(R.drawable.marker));
                         items.addItem(rests);
@@ -211,14 +228,48 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             } catch (FileNotFoundException e) {
                 System.out.println("Input file data.csv could not be found!");
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println("ERROR: " + e);
             }
             return message;
         }
+
         public void onPostExecute(String message) {
             new AlertDialog.Builder(MainActivity.this).setMessage(message).setPositiveButton("OKAY", null).show();
+        }
+    }
+
+    class LoadFromWeb extends AsyncTask<Void, Void, String> {
+        public String doInBackground(Void... unused) {
+            HttpURLConnection conn = null;
+            try {
+                URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=18&username=user008&format=csv");
+                conn = (HttpURLConnection) url.openConnection();
+                InputStream in = conn.getInputStream();
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        String[] components = line.split(",");
+                        if (components.length == 6) {
+                            ListRestaurants restFromWeb = new ListRestaurants(components[0], components[2], components[1], Integer.parseInt(components[3]), Double.parseDouble(components[5]), Double.parseDouble(components[4]));
+                            resto.add(restFromWeb);
+                            //setting restaurant marker for current position
+                            OverlayItem rests = new OverlayItem(restFromWeb.Restname, "Name of Restaurant: " + restFromWeb.Restname + " Address: " + restFromWeb.Restaddress +
+                                    "\n" + "Cusine: " + restFromWeb.Restcusine + " Rating: " + restFromWeb.Restrating, new GeoPoint(restFromWeb.latitude, restFromWeb.longitude));
+                            rests.setMarker(getResources().getDrawable(R.drawable.marker));
+                            items.addItem(rests);
+                        }
+                    }
+                    return "Successfully loaded from web";
+                } else
+                    return "HTTP ERROR: " + conn.getResponseCode();
+            } catch (IOException e) {
+                return e.toString();
+            } finally {
+                if (conn != null)
+                    conn.disconnect();
+            }
         }
     }
 }

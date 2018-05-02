@@ -4,4 +4,5 @@
     <item android:id="@+id/SaveRest" android:title="Save Restaurants"/>
     <item android:id="@+id/LoadRest" android:title="Load Restaurants"/>
     <item android:id="@+id/savePref" android:title="Save Preference"/>
+    <item android:id="@+id/loadFromWeb" android:title="Load from Web"/>
 </menu>
