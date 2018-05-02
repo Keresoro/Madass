@@ -26,7 +26,7 @@ public class AddRestaurants extends AppCompatActivity implements OnClickListener
     }
     public void onClick(View view)
     {
-        //// Edit Texts initialisation
+        // Edit Texts initialisation
         TextView restname = (TextView) findViewById(R.id.xrestname);
         EditText editname = (EditText) findViewById(R.id.xeditname);
         TextView restad = (TextView) findViewById(R.id.xrestad);

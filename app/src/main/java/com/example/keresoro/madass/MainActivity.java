@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         latitude + " " +
                         longitude, Toast.LENGTH_LONG).show();
 
+        //printing the information when marker is clicked
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             public boolean onItemLongPress(int i, OverlayItem item) {
                 Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         latitude + " " +
                         longitude, Toast.LENGTH_LONG).show();
     }
-
+    //loosing provider will print disable message
     public void onProviderDisabled(String provider) {
         Toast.makeText(this, "Provider " + provider +
                 " disabled", Toast.LENGTH_LONG).show();
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Toast.makeText(this, "Status changed: " + status,
                 Toast.LENGTH_LONG).show();
     }
-
+    //creates and shows the menu in the app
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
+        //Passing the infromation that the user entered from AddrRstaurants
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 Bundle extras = intent.getExtras();
@@ -174,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 OverlayItem rests = new OverlayItem(name, "Name of Restaurant: " + name + " Address: " + address + "\n" + "Cusine: " + cusine + " Rating: " + rating, new GeoPoint(latitude, longitude));
                 rests.setMarker(getResources().getDrawable(R.drawable.marker));
                 items.addItem(rests);
+
+                //Set the preferences to do autosave
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 boolean autoSave = prefs.getBoolean("savePreferences", true);
                 if (autoSave == true) {
@@ -185,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     //save the restaurant to file
-
     class OptionSave extends AsyncTask<Void, Void, String> {
         public String doInBackground(Void... unused) {
             String message = "Succesfully saved the restaurants!";
