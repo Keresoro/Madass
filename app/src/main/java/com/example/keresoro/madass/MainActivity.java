@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         longitude = location.getLongitude();
         mv.getController().setCenter(new GeoPoint(latitude, longitude));
         Toast.makeText
-                (this, "Your Location is" +
+                (this, "Your Location is " +
                         latitude + " " +
                         longitude, Toast.LENGTH_LONG).show();
 
